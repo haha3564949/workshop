@@ -19,23 +19,16 @@ import pandas as pd
 df1 = ts.get_hist_data('600826',start='2017-01-01',end='2018-09-14')
 
 df4=ts.sh_margin_details(symbol='600826',start='2017-01-01',end='2018-09-14')
-# df5=df1.join(df4,on=['date','opDate'],how='left')
 df4=df4.set_index('opDate')
 
 
 df5=pd.merge(df1,df4,how='left',left_index=True,right_index=True)
-# df5=pd.merge(df1,df4,how='left',left_on='date',right_on='opDate',left_index=True)
+
 df5=df5.loc[:,['open','high','low','close','volume','rzye','rqyl']]
 df5['rzrqye']=df5['rqyl']*df5['close']+df5['rzye']
 
 df=df5.sort_index()
 
-
-# df1=df1.sort_index()
-# df2=df1.reset_index('date')
-# df2['amount']=df1['volume']
-# df=df2.loc[:,['date','open','high','low','close','volume']]
-#
 def calc_EMA(df, N):
     for i in range(len(df)):
         if i==0:
