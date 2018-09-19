@@ -5,7 +5,7 @@ import pandas as pd
 from  sqlalchemy import create_engine
 
 
-engine = create_engine('oracle://tony:tony@192.168.137.131/orcl',echo=True)
+engine = create_engine('oracle://test:test@192.168.24.131/orcl',echo=True)
 
 
 def getData():
@@ -21,7 +21,23 @@ def getData():
                 df5['rzrqye']=df5['rqyl']*df5['close']+df5['rzye']
                 df=df5.sort_index()
                 # calc_MACD(df, 12, 26, 9).to_csv("d:\\workshop\\workshop\\ab\\"+i+".csv")
-                calc_MACD(df, 12, 26, 9).to_sql('rzrqye', con=engine, if_exists='append', chunksize=100, index=True)
+                dffinal=calc_MACD(df, 12, 26, 9)
+                dffinal=dffinal.reset_index()
+                dffinal['date'] = dffinal['date'].astype('string')
+                dffinal['open'] = dffinal['open'].astype('string')
+                dffinal['high'] = dffinal['high'].astype('string')
+                dffinal['low'] = dffinal['low'].astype('string')
+                dffinal['close'] = dffinal['close'].astype('string')
+                dffinal['volume'] = dffinal['volume'].astype('string')
+                dffinal['rzye'] = dffinal['rzye'].astype('string')
+                dffinal['rqyl'] = dffinal['rqyl'].astype('string')
+                dffinal['rzrqye'] = dffinal['rzrqye'].astype('string')
+                dffinal['ema'] = dffinal['ema'].astype('string')
+                dffinal['diff'] = dffinal['diff'].astype('string')
+                dffinal['dea'] = dffinal['dea'].astype('string')
+                dffinal['macd'] = dffinal['macd'].astype('string')
+
+                dffinal.to_sql('myrzrqye', con=engine, if_exists='append', chunksize=100, index=True)
         # df.to_csv("test.csv")
 #
 def calc_EMA(df, N):
