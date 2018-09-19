@@ -7,9 +7,9 @@ import pandas as pd
 
 import pandas as pd
 
-df1 = ts.get_hist_data('600826',start='2017-01-01',end='2018-09-14')
+df1 = ts.get_hist_data('600826',start='2017-01-01',end='2018-09-18')
 
-df4=ts.sh_margin_details(symbol='600826',start='2017-01-01',end='2018-09-14')
+df4=ts.sh_margin_details(symbol='600826',start='2017-01-01',end='2018-09-18')
 df4=df4.set_index('opDate')
 
 
