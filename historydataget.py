@@ -17,7 +17,7 @@ def getData():
             if len(df4)>0:
                 df4=df4.set_index('opDate')
                 df5=pd.merge(df1,df4,how='left',left_index=True,right_index=True)
-                df5=df5.loc[:,['open','high','low','close','volume','rzye','rqyl']]
+                df5=df5.loc[:,['open','high','low','close','volume','rzye','rqyl','stockCode']]
                 df5['rzrqye']=df5['rqyl']*df5['close']+df5['rzye']
                 df=df5.sort_index()
                 # calc_MACD(df, 12, 26, 9).to_csv("d:\\workshop\\workshop\\ab\\"+i+".csv")
@@ -36,7 +36,7 @@ def getData():
                 dffinal['diff'] = dffinal['diff'].astype('string')
                 dffinal['dea'] = dffinal['dea'].astype('string')
                 dffinal['macd'] = dffinal['macd'].astype('string')
-
+                dffinal['stockCode'] = dffinal['stockCode'].astype('string')
                 dffinal.to_sql('myrzrqye', con=engine, if_exists='append', chunksize=100, index=True)
         # df.to_csv("test.csv")
 #
