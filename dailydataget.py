@@ -5,7 +5,17 @@ import pandas as pd
 from  sqlalchemy import create_engine
 import datetime
 
-engine = create_engine('oracle://tony:tony@192.168.137.131/orcl',echo=True)
+
+engine = create_engine('oracle://test:test@192.168.24.131/orcl',echo=True)
+
+
+def getDBData(str):
+    # result = engine.execute('select * from myrzrqye')
+    # print(result.fetchall())
+    df2=pd.read_sql("""select * from (select  a.* from myrzrqye a where dbms_lob.substr(a."stockCode")=:a  order by dbms_lob.substr(a."date")  desc)A where rownum<27 """,engine,params={"a":str})
+
+    return df2
+
 
 def getWebData():
     today = datetime.datetime.now()
@@ -14,14 +24,16 @@ def getWebData():
     stock_info=ts.get_stock_basics()
     for i in stock_info.index:
         if i.startswith('6'):
-            df1 = ts.get_hist_data(code='600523',start=today,end=today)
-            df4 = ts.sh_margin_details(symbol='600523',start=today, end=today)
+            df1 = ts.get_hist_data(code='600366',start=today,end=today)
+            df4 = ts.sh_margin_details(symbol='600366',start=today, end=today)
             if len(df4)>0:
                 df4=df4.set_index('opDate')
                 df5=pd.merge(df1,df4,how='left',left_index=True,right_index=True)
-                df5=df5.loc[:,['open','high','low','close','volume','rzye','rqyl']]
+                df5=df5.loc[:,['open','high','low','close','volume','rzye','rqyl','stockCode']]
                 df5['rzrqye']=df5['rqyl']*df5['close']+df5['rzye']
-                df=df5.sort_index()
+                df2=getDBData('600366')
+                df2=df2.set_index("date")
+                df=df5.append(df2)
                 # calc_MACD(df, 12, 26, 9).to_csv("d:\\workshop\\workshop\\ab\\"+i+".csv")
                 dffinal=calc_MACD(df, 12, 26, 9)
                 dffinal=dffinal.reset_index()
@@ -43,36 +55,26 @@ def getWebData():
         # df.to_csv("test.csv")
 
 
-def getDBData():
-    # result = engine.execute('select * from myrzrqye')
-    # print(result.fetchall())
-    df2=pd.read_sql('select a.* from myrzrqye a where a."index"=?',engine,params={9})
-    print df2
 
 
 def calc_EMA(df, N):
-    for i in range(len(df)):
-        if i==0:
-            df.ix[i,'ema']=df.ix[i,'rzrqye']
-        if i>0:
-            df.ix[i,'ema']=((N-1)*df.ix[i-1,'ema']+2*df.ix[i,'rzrqye'])/(N+1)
-    ema=list(df['ema'])
+    # for i in range(len(df)):
+        # if i==0:
+        #     df.ix[i,'ema']=df.ix[i,'rzrqye']
+        # if i>0:
+    ema=((N-1)*(float(df.ix[1,'ema']))+2*df.ix[0,'rzrqye'])/(N+1)
+
     return ema
 
 def calc_MACD(df, short=12, long=26, M=9):
     emas = calc_EMA(df, short)
     emaq = calc_EMA(df, long)
-    temp = pd.Series(emas) - pd.Series(emaq)
-    df['diff']=list(temp)
-    for i in range(len(df)):
-       if i==0:
-           df.ix[i,'dea'] = df.ix[i,'diff']
-       if i>0:
-            df.ix[i,'dea'] = ((M-1)*df.ix[i-1,'dea'] + 2*df.ix[i,'diff'])/(M+1)
-    df['macd'] = 2*(df['diff']- df['dea'])
+    temp = emas - emaq
+    df.ix[0,'diff']=temp
+    df.ix[0,'dea'] = ((M-1)*float(df.ix[1,'dea']) + 2*df.ix[0,'diff'])/(M+1)
+    df.ix[0,'macd'] = 2*(df.ix[0,'diff']- df.ix[0,'dea'])
     return df
-# getWebData()
+getWebData()
 #
 # df4 = ts.sh_margin_details(symbol=600856,start='2018-08-01', end='2018-09-18')
 # print df4
-getDBData()
