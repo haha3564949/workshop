@@ -26,7 +26,7 @@ def getWebData():
         if scode.startswith('6'):
             df1 = ts.get_hist_data(code=scode,start=today,end=today)
             df4 = ts.sh_margin_details(symbol=scode,start=today, end=today)
-            if len(df4)>0:
+            if len(df4)>0 and len(df1)>0 :
                 df4=df4.set_index('opDate')
                 df5=pd.merge(df1,df4,how='left',left_index=True,right_index=True)
                 df5=df5.loc[:,['open','high','low','close','volume','rzye','rqyl','stockCode']]
