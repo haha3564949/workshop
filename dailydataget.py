@@ -6,9 +6,9 @@ from  sqlalchemy import create_engine
 import datetime
 
 
-engine = create_engine('oracle://test:test@192.168.24.131/orcl',echo=True)
 
 
+engine = create_engine('oracle://tony:tony@192.168.137.131/orcl',echo=True)
 def getDBData(str):
     # result = engine.execute('select * from myrzrqye')
     # print(result.fetchall())
@@ -19,13 +19,13 @@ def getDBData(str):
 
 def getWebData():
     today = datetime.datetime.now()
-    delta = datetime.timedelta(days=1)
+    delta = datetime.timedelta(days=2)
     today = (today - delta).strftime('%Y-%m-%d')
     stock_info=ts.get_stock_basics()
-    for i in stock_info.index:
-        if i.startswith('6'):
-            df1 = ts.get_hist_data(code='600366',start=today,end=today)
-            df4 = ts.sh_margin_details(symbol='600366',start=today, end=today)
+    for scode in stock_info.index:
+        if scode.startswith('6'):
+            df1 = ts.get_hist_data(code=scode,start=today,end=today)
+            df4 = ts.sh_margin_details(symbol=scode,start=today, end=today)
             if len(df4)>0:
                 df4=df4.set_index('opDate')
                 df5=pd.merge(df1,df4,how='left',left_index=True,right_index=True)
@@ -50,8 +50,8 @@ def getWebData():
                 dffinal['diff'] = dffinal['diff'].astype('string')
                 dffinal['dea'] = dffinal['dea'].astype('string')
                 dffinal['macd'] = dffinal['macd'].astype('string')
-
-                dffinal.to_sql('myrzrqye', con=engine, if_exists='append', chunksize=100, index=True)
+                dffinal=dffinal.loc[[0]]
+                dffinal.to_sql('myrzrqye', con=engine, if_exists='append', chunksize=100, index=False)
         # df.to_csv("test.csv")
 
 
@@ -63,18 +63,19 @@ def calc_EMA(df, N):
         #     df.ix[i,'ema']=df.ix[i,'rzrqye']
         # if i>0:
     ema=((N-1)*(float(df.ix[1,'ema']))+2*df.ix[0,'rzrqye'])/(N+1)
-
+    df.ix[0,'ema']=ema
     return ema
 
 def calc_MACD(df, short=12, long=26, M=9):
+    df['ema']=df['emas']
     emas = calc_EMA(df, short)
+    df.ix[0,'emas']=emas
+    df['ema']=df['emaq']
     emaq = calc_EMA(df, long)
+    df.ix[0,'emaq']=emaq
     temp = emas - emaq
     df.ix[0,'diff']=temp
     df.ix[0,'dea'] = ((M-1)*float(df.ix[1,'dea']) + 2*df.ix[0,'diff'])/(M+1)
     df.ix[0,'macd'] = 2*(df.ix[0,'diff']- df.ix[0,'dea'])
     return df
 getWebData()
-#
-# df4 = ts.sh_margin_details(symbol=600856,start='2018-08-01', end='2018-09-18')
-# print df4
