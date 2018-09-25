@@ -8,7 +8,7 @@ import datetime
 
 
 
-engine = create_engine('oracle://tony:tony@192.168.137.131/orcl',echo=True)
+engine = create_engine('oracle://test:test@192.168.24.131/orcl',echo=True)
 def getDBData(str):
     # result = engine.execute('select * from myrzrqye')
     # print(result.fetchall())
@@ -19,19 +19,24 @@ def getDBData(str):
 
 def getWebData():
     today = datetime.datetime.now()
-    delta = datetime.timedelta(days=2)
+    delta = datetime.timedelta(days=4)
     today = (today - delta).strftime('%Y-%m-%d')
     stock_info=ts.get_stock_basics()
     for scode in stock_info.index:
         if scode.startswith('6'):
             df1 = ts.get_hist_data(code=scode,start=today,end=today)
             df4 = ts.sh_margin_details(symbol=scode,start=today, end=today)
+
+
+            # df1 = ts.get_hist_data(code='601128',start=today,end=today)
+            # df4 = ts.sh_margin_details(symbol='601128',start=today, end=today)
+
             if len(df4)>0 and len(df1)>0 :
                 df4=df4.set_index('opDate')
                 df5=pd.merge(df1,df4,how='left',left_index=True,right_index=True)
                 df5=df5.loc[:,['open','high','low','close','volume','rzye','rqyl','stockCode']]
                 df5['rzrqye']=df5['rqyl']*df5['close']+df5['rzye']
-                df2=getDBData('600366')
+                df2=getDBData(scode)
                 df2=df2.set_index("date")
                 df=df5.append(df2)
                 # calc_MACD(df, 12, 26, 9).to_csv("d:\\workshop\\workshop\\ab\\"+i+".csv")
