@@ -19,7 +19,7 @@ def getDBData(str):
 
 def getWebData():
     today = datetime.datetime.now()
-    delta = datetime.timedelta(days=4)
+    delta = datetime.timedelta(days=2)
     today = (today - delta).strftime('%Y-%m-%d')
     stock_info=ts.get_stock_basics()
     for scode in stock_info.index:
