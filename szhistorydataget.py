@@ -21,13 +21,24 @@ def getData():
             # df1['stockCode'] = df1['stockCode'].astype('string')
             df1.to_sql('szrzrq', con=engine, if_exists='append', chunksize=100, index=False)
             print i
-#
+def getDBData():
+    df1 = pd.read_sql(
+        """select  distinct dbms_lob.substr(a."stockCode") from szrzrq a  """,
+        engine)
+    for str in df1.iloc[:,0]:
+        df2 = pd.read_sql(
+            """select  a.* from szrzrq a where dbms_lob.substr(a."stockCode")=:a  order by dbms_lob.substr(a."opDate")  asc""",
+            engine, params={"a": str})
+        df3=calc_MACD(df2)
+        df3.to_sql('myszrzrq', con=engine, if_exists='append', chunksize=100, index=False)
+
+
 def calc_EMA(df, N):
     for i in range(len(df)):
         if i==0:
-            df.ix[i,'ema']=df.ix[i,'rzrqye']
+            df.ix[i,'ema']=int(df.ix[i,'rzrqye'])
         if i>0:
-            df.ix[i,'ema']=((N-1)*df.ix[i-1,'ema']+2*df.ix[i,'rzrqye'])/(N+1)
+            df.ix[i,'ema']=((N-1)*int(df.ix[i-1,'ema'])+2*int(df.ix[i,'rzrqye']))/(N+1)
     ema=list(df['ema'])
     return ema
 
@@ -45,4 +56,5 @@ def calc_MACD(df, short=12, long=26, M=9):
             df.ix[i,'dea'] = ((M-1)*df.ix[i-1,'dea'] + 2*df.ix[i,'diff'])/(M+1)
     df['macd'] = 2*(df['diff']- df['dea'])
     return df
-getData()
+# getData()
+getDBData()
