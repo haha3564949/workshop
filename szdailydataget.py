@@ -8,8 +8,9 @@ import datetime
 # logger=logging.getLogger()
 # logger.setLevel(logging.INFO)
 
-engine = create_engine('oracle://tony:tony@192.168.137.131/orcl',echo=True)
+# engine = create_engine('oracle://tony:tony@192.168.137.131/orcl',echo=True)
 
+engine = create_engine('oracle://test:test@192.168.24.131/orcl',echo=True)
 def getData(yesterday):
     tempday=yesterday
     df=ts.sz_margin_details(date=tempday,retry_count=3,pause=0.01)
