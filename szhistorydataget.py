@@ -5,8 +5,9 @@ import pandas as pd
 from  sqlalchemy import create_engine
 import datetime
 
-engine = create_engine('oracle://tony:tony@192.168.137.131/orcl',echo=True)
+# engine = create_engine('oracle://tony:tony@192.168.137.131/orcl',echo=True)
 
+engine = create_engine('oracle://test:test@192.168.24.131/orcl',echo=True)
 def getData():
     mydate = datetime.datetime.today()
     for i in range(1,646):
@@ -23,7 +24,7 @@ def getData():
             print i
 def getDBData():
     df1 = pd.read_sql(
-        """select  distinct dbms_lob.substr(a."stockCode") from szrzrq a  """,
+        """  """,
         engine)
     for str in df1.iloc[:,0]:
         df2 = pd.read_sql(
