@@ -25,12 +25,14 @@ def getDBData():
     df1 = pd.read_sql(
         """select  distinct dbms_lob.substr(a."stockCode") from szrzrq a  """,
         engine)
+    dftemp = pd.DataFrame(columns=['stockCode', 'securityAbbr', 'rzrqye', 'opDate', 'ema', 'emas', 'emaq', 'diff', 'dea', 'macd'])
     for str in df1.iloc[:,0]:
         df2 = pd.read_sql(
             """select  a.* from szrzrq a where dbms_lob.substr(a."stockCode")=:a  order by dbms_lob.substr(a."opDate")  asc""",
             engine, params={"a": str})
         df3=calc_MACD(df2)
-        df3.to_sql('myszrzrq', con=engine, if_exists='append', chunksize=100, index=False)
+        dftemp=dftemp.append(df3)
+    dftemp.to_sql('myszrzrq', con=engine, if_exists='append', chunksize=100, index=False)
 
 
 def calc_EMA(df, N):
