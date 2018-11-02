@@ -26,8 +26,8 @@ def getData():
         print "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$",i,"/",total
         # if int(scode[3:6])>224:
         if scode.startswith('6'):
-            df1 = ts.get_hist_data(code=scode,start='2017-01-01',end='2018-09-25')
-            df4 = ts.sh_margin_details(symbol=scode,start='2017-01-01', end='2018-09-25')
+            df1 = ts.get_hist_data(code=scode,start='2017-01-01',end='2018-10-31')
+            df4 = ts.sh_margin_details(symbol=scode,start='2017-01-01', end='2018-10-31')
             # test with one code 600366
             # df1 = ts.get_hist_data(code='601118', start='2018-08-01', end='2018-09-18')
             # df4 = ts.sh_margin_details(symbol='601118', start='2018-08-01', end='2018-09-18')
@@ -46,17 +46,17 @@ def getData():
                 # calc_MACD(df, 12, 26, 9).to_csv("d:\\workshop\\workshop\\ab\\"+i+".csv")
                     dffinal=calc_MACD(df, 12, 26, 9)
                     dffinal=dffinal.reset_index()
-
+                    dffinal = dffinal.loc[:,['date','close','rzrqye','diff','dea','macd','stockCode','emas','emaq']]
                     dffinal['date'] = dffinal['date'].astype('string')
-                    dffinal['open'] = dffinal['open'].astype('string')
-                    dffinal['high'] = dffinal['high'].astype('string')
-                    dffinal['low'] = dffinal['low'].astype('string')
+                    # dffinal['open'] = dffinal['open'].astype('string')
+                    # dffinal['high'] = dffinal['high'].astype('string')
+                    # dffinal['low'] = dffinal['low'].astype('string')
                     dffinal['close'] = dffinal['close'].astype('string')
-                    dffinal['volume'] = dffinal['volume'].astype('string')
-                    dffinal['rzye'] = dffinal['rzye'].astype('string')
-                    dffinal['rqyl'] = dffinal['rqyl'].astype('string')
+                    # dffinal['volume'] = dffinal['volume'].astype('string')
+                    # dffinal['rzye'] = dffinal['rzye'].astype('string')
+                    # dffinal['rqyl'] = dffinal['rqyl'].astype('string')
                     dffinal['rzrqye'] = dffinal['rzrqye'].astype('string')
-                    dffinal['ema'] = dffinal['ema'].astype('string')
+                    # dffinal['ema'] = dffinal['ema'].astype('string')
                     dffinal['diff'] = dffinal['diff'].astype('string')
                     dffinal['dea'] = dffinal['dea'].astype('string')
                     dffinal['macd'] = dffinal['macd'].astype('string')

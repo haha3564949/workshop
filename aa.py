@@ -19,3 +19,7 @@ df['rqyl']=df['rqyl'].astype('string')
 df['rqmcl']=df['rqmcl'].astype('string')
 df['rqchl']=df['rqchl'].astype('string')
 df.to_sql('sh_margin_details',con=engine, if_exists='append',chunksize=100,index=True)
+
+# df4 = ts.sh_margin_details(symbol=scode, start='2017-01-01', end='2018-09-25')
+
+print df1

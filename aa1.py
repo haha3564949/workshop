@@ -24,8 +24,8 @@ engine = create_engine('oracle://tony:tony@192.168.137.131/orcl',echo=True)
 # #     conn.close()
 
 df=ts.get_today_all();
-df1 = df.loc[:, ['code', 'settlement']];
-print df1
+
+print df
 # df4 = ts.sh_margin_details(start='2018-10-30', end='2018-10-30')
 
 # ['code', 'symbol', 'name', 'changepercent','trade', 'open', 'high', 'low', 'settlement', 'volume', 'turnoverratio',  'amount', 'per', 'pb', 'mktcap', 'nmc']

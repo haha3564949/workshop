@@ -10,6 +10,7 @@ import datetime
 
 engine = create_engine('oracle://tony:tony@192.168.137.131/orcl',echo=True)
 
+# engine = create_engine('oracle://test:test@192.168.24.131/orcl',echo=True)
 def getData(yesterday):
     tempday=yesterday
     df=ts.sz_margin_details(date=tempday,retry_count=3,pause=0.01)
@@ -75,10 +76,13 @@ def calc_MACD(df, short=12, long=26, M=9):
 
 def main():
     mydate = datetime.datetime.today()
-    delta = datetime.timedelta(days=1)
-    yesterday = (mydate - delta).strftime('%Y-%m-%d')
-    getData(yesterday)
-    getDBData(yesterday)
+    for i in range(0,22):
+
+        delta = datetime.timedelta(days=22-i)
+        yesterday = (mydate - delta).strftime('%Y-%m-%d')
+        print yesterday
+        getData(yesterday)
+        getDBData(yesterday)
 
 if __name__ == '__main__':
     main()
