@@ -9,10 +9,10 @@ import datetime
 
 
 engine = create_engine('oracle://test:test@192.168.24.131/orcl',echo=True)
-def getDBData(str):
+def getDBData():
     # result = engine.execute('select * from myrzrqye')
     # print(result.fetchall())
-    df2=pd.read_sql("""select * from (select  a."date",a."stockCode",a.close,a.rzrqye ,a.emas,a.emaq,a.diff,a.dea,a.macd from myrzrqye a where dbms_lob.substr(a."stockCode")=:a  order by dbms_lob.substr(a."date")  desc)A where rownum<27  """,engine,params={"a":str})
+    df2=pd.read_sql("""select  dbms_lob.substr(a."date")  "date",dbms_lob.substr(a."stockCode") "stockCode",dbms_lob.substr(a.close) "close",dbms_lob.substr(a.rzrqye) "rzrqye",dbms_lob.substr(a.emas) "emas",dbms_lob.substr(a.emaq) "emaq",dbms_lob.substr(a.diff) "diff",dbms_lob.substr(a.dea) "dea",dbms_lob.substr(a.macd) "macd" from myrzrqye a  """,engine)
 
     return df2
 
@@ -24,9 +24,9 @@ def getWebData():
     df = ts.get_today_all();
     df1 =df.loc[:,['code','settlement']];
     df1.rename(columns={'settlement': 'close','code':'stockCode'},inplace=True);
-    df2 = ts.sh_margin_details(start='2018-10-30', end='2018-10-30')
-
-
+    df2 = ts.sh_margin_details(start='2018-11-01', end='2018-11-01')
+    dfresult= pd.DataFrame(
+            columns=['date', 'close', 'dea', 'diff', 'emaq', 'emas', 'macd', 'rzrqye', 'stockCode', 'ema'])
 
     if len(df2)>0 and len(df1)>0 :
         df2=df2.set_index('stockCode');
@@ -34,18 +34,31 @@ def getWebData():
         df3=pd.merge(df1,df2,how='left',left_index=True,right_index=True)
         df3=df3.loc[:,['close','rqyl','rzye','opDate']]
         df3['rzrqye']=df3['rqyl']*df3['close']+df3['rzye']
+
+        df4 = getDBData()
+        df4 = df4.set_index('stockCode');
         for scode in filter(isSHStock,df3.index):
             print scode
-            df4=getDBData(scode)
-            df4=df4.set_index("date")
-            df3=df3.filter(regex=scode,axis=0);
-            df3=df3.reset_index('stockCode');
-            df3=df3.set_index('opDate')
-            df3=df3.loc[:,['close','rzrqye','stockCode']]
-            df=df3.append(df4);
-            dffinal = calc_MACD(df, 12, 26, 9)
-            dffinal = dffinal.reset_index()
-            dffinal.to_sql('myrzrqye1', con=engine, if_exists='append', chunksize=100, index=False)
+            df6=df4.filter(regex=scode,axis=0)
+            df6=df6.sort_values(by='date',ascending=False)
+            if(len(df6)>27):
+                df6=df6.iloc[0:27,]
+            if(len(df6)>0):
+                df6=df6.reset_index();
+                df6.rename(columns={'index': 'stockCode'}, inplace=True);
+                df6=df6.set_index("date")
+                df5=df3.filter(regex=scode,axis=0);
+                df5=df5.reset_index('stockCode');
+                df5=df5.set_index('opDate')
+                df5=df5.loc[:,['close','rzrqye','stockCode']]
+                df=df5.append(df6);
+                dffinal = calc_MACD(df, 12, 26, 9)
+                dffinal = dffinal.reset_index()
+
+                dffinal.rename(columns={'index': 'date'},inplace=True);
+                dffinal = dffinal.loc[[0]]
+                dfresult=dfresult.append(dffinal)
+        dfresult.to_sql('myrzrqye', con=engine, if_exists='append', chunksize=100, index=False)
 
 
 def calc_EMA(df, N):
