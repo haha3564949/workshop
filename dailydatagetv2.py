@@ -6,9 +6,9 @@ from  sqlalchemy import create_engine
 import datetime
 
 
+engine = create_engine('oracle://tony:tony@192.168.137.131/orcl',echo=True)
 
-
-engine = create_engine('oracle://test:test@192.168.24.131/orcl',echo=True)
+# engine = create_engine('oracle://test:test@192.168.24.131/orcl',echo=True)
 def getDBData():
     # result = engine.execute('select * from myrzrqye')
     # print(result.fetchall())
@@ -17,14 +17,12 @@ def getDBData():
     return df2
 
 
-def getWebData():
-    today = datetime.datetime.now()
-    delta = datetime.timedelta(days=4)
-    today = (today - delta).strftime('%Y-%m-%d')
+def getWebData(yesterday):
+
     df = ts.get_today_all();
     df1 =df.loc[:,['code','settlement']];
     df1.rename(columns={'settlement': 'close','code':'stockCode'},inplace=True);
-    df2 = ts.sh_margin_details(start='2018-11-01', end='2018-11-01')
+    df2 = ts.sh_margin_details(start=yesterday, end=yesterday)
     dfresult= pd.DataFrame(
             columns=['date', 'close', 'dea', 'diff', 'emaq', 'emas', 'macd', 'rzrqye', 'stockCode', 'ema'])
 
@@ -85,4 +83,18 @@ def calc_MACD(df, short=12, long=26, M=9):
 def isSHStock(str):
     return str.startswith('6');
 
-getWebData()
+
+def main():
+    mydate = datetime.datetime.today()
+    delta= datetime.timedelta(days=1)
+    if mydate.weekday() ==0:
+        delta = datetime.timedelta(days=3)
+    if mydate.weekday() == 6:
+        delta = datetime.timedelta(days=2)
+
+    yesterday = (mydate - delta).strftime('%Y-%m-%d')
+
+    getWebData(yesterday)
+
+if __name__ == '__main__':
+    main()

@@ -76,10 +76,11 @@ def calc_MACD(df, short=12, long=26, M=9):
 
 def main():
     mydate = datetime.datetime.today()
-    for i in range(0,22):
+    for i in range(0,14):
 
-        delta = datetime.timedelta(days=22-i)
+        delta = datetime.timedelta(days=14-i)
         yesterday = (mydate - delta).strftime('%Y-%m-%d')
+
         print yesterday
         getData(yesterday)
         getDBData(yesterday)

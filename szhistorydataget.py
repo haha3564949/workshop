@@ -5,9 +5,9 @@ import pandas as pd
 from  sqlalchemy import create_engine
 import datetime
 
-# engine = create_engine('oracle://tony:tony@192.168.137.131/orcl',echo=True)
+engine = create_engine('oracle://tony:tony@192.168.137.131/orcl',echo=True)
 
-engine = create_engine('oracle://test:test@192.168.24.131/orcl',echo=True)
+# engine = create_engine('oracle://test:test@192.168.24.131/orcl',echo=True)
 def getData():
     mydate = datetime.datetime.today()
     for i in range(1,646):
@@ -24,7 +24,7 @@ def getData():
             print i
 def getDBData():
     df1 = pd.read_sql(
-        """  """,
+        """ select distinct dbms_lob.substr(a."stockCode")  from szrzrq a  """,
         engine)
     dftemp = pd.DataFrame(columns=['stockCode', 'securityAbbr', 'rzrqye', 'opDate', 'ema', 'emas', 'emaq', 'diff', 'dea', 'macd'])
     for str in df1.iloc[:,0]:
@@ -59,5 +59,5 @@ def calc_MACD(df, short=12, long=26, M=9):
             df.ix[i,'dea'] = ((M-1)*df.ix[i-1,'dea'] + 2*df.ix[i,'diff'])/(M+1)
     df['macd'] = 2*(df['diff']- df['dea'])
     return df
-# getData()
-getDBData()
+# getData()    #get history rzrqdata
+getDBData()     #calculate the rzrqye data
