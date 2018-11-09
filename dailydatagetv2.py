@@ -20,8 +20,8 @@ def getDBData():
 def getWebData(yesterday):
 
     df = ts.get_today_all();
-    df1 =df.loc[:,['code','settlement']];
-    df1.rename(columns={'settlement': 'close','code':'stockCode'},inplace=True);
+    df1 =df.loc[:,['code','trade']];
+    df1.rename(columns={'trade': 'close','code':'stockCode'},inplace=True);
     df2 = ts.sh_margin_details(start=yesterday, end=yesterday)
     dfresult= pd.DataFrame(
             columns=['date', 'close', 'dea', 'diff', 'emaq', 'emas', 'macd', 'rzrqye', 'stockCode', 'ema'])
@@ -85,6 +85,7 @@ def isSHStock(str):
 
 
 def main():
+    # every day before 9:00 AM ,else the trade should be exchanged to settlement
     mydate = datetime.datetime.today()
     delta= datetime.timedelta(days=1)
     if mydate.weekday() ==0:
