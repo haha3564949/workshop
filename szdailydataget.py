@@ -76,14 +76,18 @@ def calc_MACD(df, short=12, long=26, M=9):
 
 def main():
     mydate = datetime.datetime.today()
-    for i in range(0,14):
 
-        delta = datetime.timedelta(days=14-i)
-        yesterday = (mydate - delta).strftime('%Y-%m-%d')
+    delta= datetime.timedelta(days=1)
+    if mydate.weekday() ==0:
+        delta = datetime.timedelta(days=3)
+    if mydate.weekday() == 6:
+        delta = datetime.timedelta(days=2)
 
-        print yesterday
-        getData(yesterday)
-        getDBData(yesterday)
+    yesterday = (mydate - delta).strftime('%Y-%m-%d')
+
+    print yesterday
+    getData(yesterday)
+    getDBData(yesterday)
 
 if __name__ == '__main__':
     main()
