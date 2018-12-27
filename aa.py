@@ -11,15 +11,21 @@ engine = create_engine('oracle://tony:tony@192.168.137.131/orcl',echo=True)
 # df.to_sql('tick_data',con=engine, if_exists='replace')
 
 
-df=ts.sh_margin_details(start='2016-01-01', end='2016-12-31')
-df['rzye']=df['rzye'].astype('string')
-df['rzmre']=df['rzmre'].astype('string')
-df['rzche']=df['rzche'].astype('string')
-df['rqyl']=df['rqyl'].astype('string')
-df['rqmcl']=df['rqmcl'].astype('string')
-df['rqchl']=df['rqchl'].astype('string')
-df.to_sql('sh_margin_details',con=engine, if_exists='append',chunksize=100,index=True)
 
-# df4 = ts.sh_margin_details(symbol=scode, start='2017-01-01', end='2018-09-25')
+df=ts.sz_margin_details('2018-11-22')
+print df
 
-print df1
+# request = Request(rv.MAR_SZ_HZ_URL % (ct.P_TYPE['http'], ct.DOMAINS['szse'],
+#                                       ct.PAGES['szsefc'], date))
+\
+
+
+# request = Request(rv.LHB_SINA_URL_TONY % (ct.P_TYPE['http'], ct.DOMAINS['vsf'],
+#
+#
+#                                     date))
+
+#
+# df = pd.read_html(lines, skiprows=[2])[1]
+#
+# LHB_SINA_URL_TONY = '%s%s/q/go.php/vInvestConsult/kind/rzrq/index.phtml?tradedate=%s'
