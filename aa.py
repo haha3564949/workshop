@@ -1,6 +1,7 @@
 # import tushare as ts
 #
 # ts.sh_margin_details(start='2015-01-01', end='2015-04-19', symbol='600826')
+import pandas as pd
 from  sqlalchemy import create_engine
 import tushare as ts
 
@@ -11,9 +12,12 @@ engine = create_engine('oracle://tony:tony@192.168.137.131/orcl',echo=True)
 # df.to_sql('tick_data',con=engine, if_exists='replace')
 
 
-
-df=ts.sz_margin_details('2018-11-22')
-print df
+# df1 = ts.get_hist_data(code='600826', start='2017-01-03', end='2017-01-03')
+try:
+    pd.read_sql("update AA set AA.AA = 3",engine)
+except Exception,e:
+    print e.message
+print "done"
 
 # request = Request(rv.MAR_SZ_HZ_URL % (ct.P_TYPE['http'], ct.DOMAINS['szse'],
 #                                       ct.PAGES['szsefc'], date))
