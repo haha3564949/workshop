@@ -1,22 +1,25 @@
 import tushare as ts
+from tushare.stock import cons as ct
+import urllib
+import pandas as pd
+import json
+try:
+    from urllib.request import urlopen, Request
+except ImportError:
+    from urllib2 import urlopen, Request
+
 import datetime
-from sqlalchemy import create_engine
-# engine = create_engine('oracle://tony:tony@192.168.137.131/orcl',echo=True)
-#
-# mydate = datetime.datetime.today()
-#
-# delta = datetime.timedelta(days=1)
-#
-# yesterday = datetime.datetime.strptime((mydate - delta).strftime('%Y-%m-%d'),"%Y-%m-%d").weekday()
-# print yesterday
 
-# yesterday= (mydate-delta).strptime(mydate-delta, "%Y-%m-%d %H:%M:%S")
-# df=ts.sh_margin_details(start='2018-12-25' , end='2018-12-25')
-df=ts.get_today_all()
+url = ct.EASTMONEY_TONY % (ct.P_TYPE['http'], ct.DOMAINS['em1'] , '\'2019-01-07\'')
+request = Request(url)
+lines = urlopen(request, timeout=10).read()
+df=pd.read_json(lines,orient='record',dtype={"scode":str,"tdate":datetime})
 
-df1 = ts.get_hist_data(code='600030', start='2018-12-24', end='2018-12-31')
-# df4 = ts.sh_margin_details(symbol=scode, start='2017-01-01', end='2018-10-31')
-print df1
+print df
+
+# EASTMONEY_TONY='%s%s/em_mutisvcexpandinterface/api/js/get?type=RZRQ_DETAIL_NJ&token=70f12f2f4f091e459a279469fe49eca5&filter=(tdate=%s)'
+
+# 'em1':'dcfm.eastmoney.com'}
 
 
-http://dcfm.eastmoney.com/em_mutisvcexpandinterface/api/js/get?type=RZRQ_DETAIL_NJ&token=70f12f2f4f091e459a279469fe49eca5&filter=(tdate=%272019-01-07%27)
+# http://dcfm.eastmoney.com/em_mutisvcexpandinterface/api/js/get?type=RZRQ_DETAIL_NJ&token=70f12f2f4f091e459a279469fe49eca5&filter=(tdate=%272019-01-07%27)
