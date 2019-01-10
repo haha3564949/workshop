@@ -15,7 +15,7 @@ import datetime
 from sqlalchemy.dialects.mysql import   DATE,FLOAT,   VARCHAR
 
 # engine = create_engine('oracle://tony:tony@192.168.137.131/orcl',echo=True)
-engine=create_engine('mysql+mysqldb://root:root@192.168.137.131:3306/rzrq?charset=utf8')
+engine=create_engine('mysql+mysqldb://root:123@192.168.11.129:3306/rzrq?charset=utf8')
 # engine = create_engine('oracle://test:test@192.168.11.129/orcl',echo=True)
 def getInitWebData(startnum,endnum):
     mydate = datetime.datetime.today()
@@ -71,7 +71,7 @@ def getDBData():
     dftemp = pd.DataFrame(columns=['scode', 'sname', 'rzrqye', 'tdate', 'ema', 'emas', 'emaq', 'diff', 'dea', 'macd'])
     for str in df1.iloc[:,0]:
         df2 = pd.read_sql(
-            "select  a.* from rzrqtemp a where a.scode=%s and a.rzrqye is not null order by a.tdate  desc",
+            "select  a.* from rzrqtemp a where a.scode=%s and a.rzrqye is not null order by a.tdate  asc",
             engine,params={str})
         df3=calc_MACD(df2)
         dftemp=dftemp.append(df3)
@@ -107,7 +107,7 @@ def main():
     # every day before 9:00 AM ,else the trade should be exchanged to settlement
     startnum=1
     endnum=50
-    getInitWebData(startnum, endnum)
+    # getInitWebData(startnum, endnum)
     # getInitPriceData(startnum, endnum);
     # updateInitWebData("update rzrqtemp rzt set rzt.rqye = rzt.rzye+rzt.rqyl*(select rzp.close from rzrqprice rzp where rzt.stockCode = rzp.stockCode and rzt.opDate= rzp.date) "
     #                   "    where  rzt.rqye<0 ");
