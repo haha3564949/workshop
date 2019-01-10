@@ -14,6 +14,7 @@ def getInitWebData(startnum,endnum):
     for i in range(startnum,endnum+1):
         delta = datetime.timedelta(days=i)
         tempday = (mydate - delta).strftime('%Y-%m-%d')
+        print tempday
         try:
             df=ts.sz_margin_details(date=tempday,retry_count=3,pause=0.01)
             if len(df)>0:
@@ -90,12 +91,12 @@ def calc_MACD(df, short=12, long=26, M=9):
 
 def main():
     # every day before 9:00 AM ,else the trade should be exchanged to settlement
-    startnum=1
-    endnum=100
-    getInitWebData(startnum, endnum);
-    getInitPriceData(startnum, endnum);
-    updateInitWebData("update rzrqtemp rzt set rzt.rqye = rzt.rzye+rzt.rqyl*(select rzp.close from rzrqprice rzp where rzt.\"stockCode\" = rzp.\"stockCode\" and rzt.\"opDate\" = rzp.\"date\") "
-                      "    where  rzt.rqye<0 ");
+    # startnum=1
+    # endnum=1
+    # getInitWebData(startnum, endnum);
+    # getInitPriceData(startnum, endnum);
+    # updateInitWebData("update rzrqtemp rzt set rzt.rqye = rzt.rzye+rzt.rqyl*(select rzp.close from rzrqprice rzp where rzt.\"stockCode\" = rzp.\"stockCode\" and rzt.\"opDate\" = rzp.\"date\") "
+    #                   "    where  rzt.rqye<0 ");
     getDBData()
 
 
