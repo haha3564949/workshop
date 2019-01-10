@@ -66,13 +66,11 @@ def updateInitWebData(sql):
 def getDBData():
 
     df1 = pd.read_sql(
-        """ select distinct  a.scode  from rzrqtemp a where a.rzrqye is not null """,
+        " select distinct  a.scode  from rzrqtemp a where a.rzrqye is not null" ,
         engine)
     dftemp = pd.DataFrame(columns=['scode', 'sname', 'rzrqye', 'tdate', 'ema', 'emas', 'emaq', 'diff', 'dea', 'macd'])
     for str in df1.iloc[:,0]:
-        sql="select * from (select  a.* from rzrqall a where a.scode=%s and a.rzrqye is not null order by a.tdate desc limit 27)aa  "
-            " union  select '' as 'dea','' as 'diff' ,'' as  'ema','' as 'emaq','' as 'emas' ,'' as 'macd',rzrqye,scode,sname,tdate from rzrqtemp  "
-            " where scode=%s and tdate>(select  max(a.tdate) from rzrqall a where a.scode=%s) order by 10 desc"
+        sql="select * from (select  a.* from rzrqall a where a.scode=%s and a.rzrqye is not null order by a.tdate desc limit 27)aa  union  select '' as 'dea','' as 'diff' ,'' as  'ema','' as 'emaq','' as 'emas' ,'' as 'macd',rzrqye,scode,sname,tdate from rzrqtemp  where scode=%s and tdate>(select  max(a.tdate) from rzrqall a where a.scode=%s) order by 10 desc"
         sql1=sql % (str,str,str)
         df2 = pd.read_sql(sql1
             ,
@@ -102,7 +100,7 @@ def calc_MACD(df, short=12, long=26, M=9):
     df.ix[0,'emaq']=emaq
     temp = emas - emaq
     df.ix[0,'diff']=temp
-    df.ix[0,'dea'] = ((M-1)*(df.ix[1,'dea']) + 2*float(df.ix[0,'diff']))/(M+1)
+    df.ix[0,'dea'] = ((M-1)*float((df.ix[1,'dea'])) + 2*float(df.ix[0,'diff']))/(M+1)
     df.ix[0,'macd'] = 2*(float(df.ix[0,'diff'])- float(df.ix[0,'dea']))
     return df.loc[[0]]
 
@@ -110,7 +108,7 @@ def main():
     # every day before 9:00 AM ,else the trade should be exchanged to settlement
     startnum=1
     endnum=1
-    # getInitWebData(startnum, endnum);
+    getInitWebData(startnum, endnum);
     # getInitPriceData(startnum, endnum);
     # updateInitWebData("update rzrqtemp rzt set rzt.rqye = rzt.rzye+rzt.rqyl*(select rzp.close from rzrqprice rzp where rzt.stockCode = rzp.stockCode and rzt.opDate= rzp.date) "
     #                   "    where  rzt.rqye<0 ");
