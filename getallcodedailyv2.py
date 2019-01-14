@@ -15,7 +15,9 @@ import datetime
 from sqlalchemy.dialects.mysql import   DATE,FLOAT,   VARCHAR
 
 # engine = create_engine('oracle://tony:tony@192.168.137.131/orcl',echo=True)
-engine=create_engine('mysql+mysqldb://root:123@192.168.11.129:3306/rzrq?charset=utf8')
+engine=create_engine('mysql+mysqldb://root:root@192.168.137.131:3306/rzrq?charset=utf8')
+EASTMONEY_TONY='%s%s/em_mutisvcexpandinterface/api/js/get?type=RZRQ_DETAIL_NJ&token=70f12f2f4f091e459a279469fe49eca5&filter=(tdate=%s)'
+em1='dcfm.eastmoney.com'
 # engine = create_engine('oracle://test:test@192.168.11.129/orcl',echo=True)
 def getInitWebData(startnum,endnum):
     mydate = datetime.datetime.today()
@@ -23,7 +25,7 @@ def getInitWebData(startnum,endnum):
         delta = datetime.timedelta(days=i)
         tempday = (mydate - delta).strftime('%Y-%m-%d')
         try:
-            url = ct.EASTMONEY_TONY % (ct.P_TYPE['http'], ct.DOMAINS['em1'], '\''+tempday+'\'')
+            url = ct.EASTMONEY_TONY % ('http://', em1, '\''+tempday+'\'')
             request = Request(url)
             lines = urlopen(request, timeout=10).read()
             df = pd.read_json(lines, orient='record', dtype={"scode": str })
@@ -106,8 +108,16 @@ def calc_MACD(df, short=12, long=26, M=9):
 
 def main():
     # every day before 9:00 AM ,else the trade should be exchanged to settlement
+    mydate = datetime.datetime.today()
     startnum=1
     endnum=1
+    if mydate.weekday() ==0:
+        startnum = 3
+        endnum = 3
+    if mydate.weekday() == 6:
+        startnum =2
+        endnum =2
+
     getInitWebData(startnum, endnum);
     # getInitPriceData(startnum, endnum);
     # updateInitWebData("update rzrqtemp rzt set rzt.rqye = rzt.rzye+rzt.rqyl*(select rzp.close from rzrqprice rzp where rzt.stockCode = rzp.stockCode and rzt.opDate= rzp.date) "
