@@ -1,0 +1,152 @@
+login as: root
+root@192.168.137.131's password:
+Last login: Wed Aug  8 03:45:54 2018 from 192.168.137.1
+[root@red-oracle ~]# df -h
+Filesystem                    Size  Used Avail Use% Mounted on
+/dev/mapper/VolGroup-lv_root   18G   14G  3.1G  82% /
+tmpfs                         2.1G 1004M  1.1G  48% /dev/shm
+/dev/sda1                     477M   55M  398M  13% /boot
+[root@red-oracle ~]# fdisk -l
+
+Disk /dev/sda: 32.2 GB, 32212254720 bytes
+255 heads, 63 sectors/track, 3916 cylinders
+Units = cylinders of 16065 * 512 = 8225280 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x0006096f
+
+   Device Boot      Start         End      Blocks   Id  System
+/dev/sda1   *           1          64      512000   83  Linux
+Partition 1 does not end on cylinder boundary.
+/dev/sda2              64        2611    20458496   8e  Linux LVM
+/dev/sda3            2611        3916    10483750   8e  Linux LVM
+
+Disk /dev/mapper/VolGroup-lv_root: 18.9 GB, 18865979392 bytes
+255 heads, 63 sectors/track, 2293 cylinders
+Units = cylinders of 16065 * 512 = 8225280 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x00000000
+
+
+Disk /dev/mapper/VolGroup-lv_swap: 2080 MB, 2080374784 bytes
+255 heads, 63 sectors/track, 252 cylinders
+Units = cylinders of 16065 * 512 = 8225280 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x00000000
+
+[root@red-oracle ~]# pvcreate /dev/sda3
+  dev_is_mpath: failed to get device for 8:3
+  Physical volume "/dev/sda3" successfully created
+[root@red-oracle ~]# pvdisplay
+  --- Physical volume ---
+  PV Name               /dev/sda2
+  VG Name               VolGroup
+  PV Size               19.51 GiB / not usable 3.00 MiB
+  Allocatable           yes (but full)
+  PE Size               4.00 MiB
+  Total PE              4994
+  Free PE               0
+  Allocated PE          4994
+  PV UUID               xFOOQH-gwVo-JeTS-nVdL-AaKL-6wKG-Cl6MUg
+
+  "/dev/sda3" is a new physical volume of "10.00 GiB"
+  --- NEW Physical volume ---
+  PV Name               /dev/sda3
+  VG Name
+  PV Size               10.00 GiB
+  Allocatable           NO
+  PE Size               0
+  Total PE              0
+  Free PE               0
+  Allocated PE          0
+  PV UUID               HSASFQ-7ZKy-ptuf-0d7e-1Fs0-sNui-CjT793
+
+[root@red-oracle ~]# vgextend VolGroup
+  Please enter a physical volume path
+  Run `vgextend --help' for more information.
+[root@red-oracle ~]# vgextend VolGroup /dev/sda3
+  Volume group "VolGroup" successfully extended
+[root@red-oracle ~]# vgextend VolGroup /dev/sda3
+  Physical volume '/dev/sda3' is already in volume group 'VolGroup'
+  Unable to add physical volume '/dev/sda3' to volume group 'VolGroup'.
+[root@red-oracle ~]# vgdisplay
+  --- Volume group ---
+  VG Name               VolGroup
+  System ID
+  Format                lvm2
+  Metadata Areas        2
+  Metadata Sequence No  4
+  VG Access             read/write
+  VG Status             resizable
+  MAX LV                0
+  Cur LV                2
+  Open LV               2
+  Max PV                0
+  Cur PV                2
+  Act PV                2
+  VG Size               29.50 GiB
+  PE Size               4.00 MiB
+  Total PE              7553
+  Alloc PE / Size       4994 / 19.51 GiB
+  Free  PE / Size       2559 / 10.00 GiB
+  VG UUID               dBAGcz-F4ZQ-RLVi-dF9U-0OnK-MGpN-vhNYOp
+
+[root@red-oracle ~]# lvextend -l +2559 /dev/VolGroup/LogVo100
+  Logical volume LogVo100 not found in volume group VolGroup
+[root@red-oracle ~]# lvextend -l +2559 /dev/VolGroup/lv_root
+  Extending logical volume lv_root to 27.57 GiB
+  Logical volume lv_root successfully resized
+[root@red-oracle ~]# lvdisplay
+  --- Logical volume ---
+  LV Path                /dev/VolGroup/lv_root
+  LV Name                lv_root
+  VG Name                VolGroup
+  LV UUID                bZgS3P-tIRY-0ZS2-u7fn-48jf-4Lnp-srpWlm
+  LV Write Access        read/write
+  LV Creation host, time localhost.localdomain, 2018-08-06 06:42:47 -0400
+  LV Status              available
+  # open                 1
+  LV Size                27.57 GiB
+  Current LE             7057
+  Segments               2
+  Allocation             inherit
+  Read ahead sectors     auto
+  - currently set to     256
+  Block device           252:0
+
+  --- Logical volume ---
+  LV Path                /dev/VolGroup/lv_swap
+  LV Name                lv_swap
+  VG Name                VolGroup
+  LV UUID                8D1GAb-cjAH-Wtfm-Fh4S-wt0v-OnmR-M6ciXP
+  LV Write Access        read/write
+  LV Creation host, time localhost.localdomain, 2018-08-06 06:42:48 -0400
+  LV Status              available
+  # open                 2
+  LV Size                1.94 GiB
+  Current LE             496
+  Segments               1
+  Allocation             inherit
+  Read ahead sectors     auto
+  - currently set to     256
+  Block device           252:1
+
+[root@red-oracle ~]# resize2fs /dev/mapper/VolGroup-lv_root
+resize2fs 1.43-WIP (20-Jun-2013)
+Filesystem at /dev/mapper/VolGroup-lv_root is mounted on /; on-line resizing required
+old_desc_blocks = 2, new_desc_blocks = 2
+The filesystem on /dev/mapper/VolGroup-lv_root is now 7226368 blocks long.
+--如果上边命令报错，用下边命令。
+[root@red-oracle ~]# xfs_growfs /dev/mapper/VolGroup-lv_root
+ 
+
+
+
+[root@red-oracle ~]# df -h
+Filesystem                    Size  Used Avail Use% Mounted on
+/dev/mapper/VolGroup-lv_root   28G   14G   13G  52% /
+tmpfs                         2.1G 1004M  1.1G  48% /dev/shm
+/dev/sda1                     477M   55M  398M  13% /boot
+[root@red-oracle ~]#
