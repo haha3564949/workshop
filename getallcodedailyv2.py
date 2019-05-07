@@ -24,6 +24,7 @@ def getInitWebData(startnum,endnum):
     for i in range(startnum,endnum+1):
         delta = datetime.timedelta(days=i)
         tempday = (mydate - delta).strftime('%Y-%m-%d')
+        print tempday
         try:
             url = ct.EASTMONEY_TONY % ('http://', em1, '\''+tempday+'\'')
             request = Request(url)
@@ -72,15 +73,18 @@ def getDBData():
         engine)
     dftemp = pd.DataFrame(columns=['scode', 'sname', 'rzrqye', 'tdate', 'ema', 'emas', 'emaq', 'diff', 'dea', 'macd'])
     for str in df1.iloc[:,0]:
-        sql="select * from (select  a.* from rzrqall a where a.scode=%s and a.rzrqye is not null order by a.tdate desc limit 27)aa  union  select '' as 'dea','' as 'diff' ,'' as  'ema','' as 'emaq','' as 'emas' ,'' as 'macd',rzrqye,scode,sname,tdate from rzrqtemp  where scode=%s and tdate>(select  max(a.tdate) from rzrqall a where a.scode=%s) order by 10 desc"
-        sql1=sql % (str,str,str)
+        sql="select * from (select  a.* from rzrqall a where a.scode=%s and a.rzrqye is not null and exists(select   1  from rzrqtemp  where scode=%s and tdate>(select  max(a.tdate) from rzrqall a where a.scode=%s)) order by a.tdate desc limit 27)aa  union  select 0 as 'dea',0 as 'diff' ,0 as  'ema',0 as 'emaq',0 as 'emas' ,0 as 'macd',rzrqye,scode,sname,tdate from rzrqtemp  where scode=%s and tdate>(select  max(a.tdate) from rzrqall a where a.scode=%s) order by 10 desc"
+        sql1=sql % (str,str,str,str,str)
         df2 = pd.read_sql(sql1
             ,
             engine)
-        df3=calc_MACD(df2)
-        # df3 = df3.loc[[26]]
-        dftemp=dftemp.append(df3)
-        print str
+        if str=="002118":
+            print str
+        if(df2.size>1):
+            df3=calc_MACD(df2)
+            # df3 = df3.loc[[26]]
+            dftemp=dftemp.append(df3)
+            print str
     dftemp.to_sql('rzrqall', con=engine, if_exists='append', chunksize=100, index=False,dtype={'stockCode':VARCHAR(6),'securityAbbr':VARCHAR(20)} )
 
 
@@ -117,11 +121,10 @@ def main():
     if mydate.weekday() == 6:
         startnum =2
         endnum =2
-
     getInitWebData(startnum, endnum);
-    # getInitPriceData(startnum, endnum);
-    # updateInitWebData("update rzrqtemp rzt set rzt.rqye = rzt.rzye+rzt.rqyl*(select rzp.close from rzrqprice rzp where rzt.stockCode = rzp.stockCode and rzt.opDate= rzp.date) "
-    #                   "    where  rzt.rqye<0 ");
+    getInitPriceData(startnum, endnum);
+    updateInitWebData("update rzrqtemp rzt set rzt.rqye = rzt.rzye+rzt.rqyl*(select rzp.close from rzrqprice rzp where rzt.stockCode = rzp.stockCode and rzt.opDate= rzp.date) "
+                      "    where  rzt.rqye<0 ");
     getDBData()
 
 
