@@ -122,9 +122,9 @@ def main():
         startnum =2
         endnum =2
     getInitWebData(startnum, endnum);
-    getInitPriceData(startnum, endnum);
-    updateInitWebData("update rzrqtemp rzt set rzt.rqye = rzt.rzye+rzt.rqyl*(select rzp.close from rzrqprice rzp where rzt.stockCode = rzp.stockCode and rzt.opDate= rzp.date) "
-                      "    where  rzt.rqye<0 ");
+    # getInitPriceData(startnum, endnum);
+    # updateInitWebData("update rzrqtemp rzt set rzt.rqye = rzt.rzye+rzt.rqyl*(select rzp.close from rzrqprice rzp where rzt.stockCode = rzp.stockCode and rzt.opDate= rzp.date) "
+    #                   "    where  rzt.rqye<0 ");
     getDBData()
 
 
